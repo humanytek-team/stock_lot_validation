@@ -47,4 +47,26 @@ class StockMoveLots(models.Model):
                 res['warning'] = {'title': _('Warning'), 'message': message}
         return res
 
+    #@api.multi
+    #def do_plus(self):
+        #res = {}
+        #if self.env.context.get('raw_material'):
+            #StockQuant = self.env['stock.quant']
+            #quants = StockQuant.search([
+                    #('product_id.id', '=', self.product_id.id),
+                    #('lot_id.id', '=', self.lot_id.id),
+                    #('location_id.id', '=', self.env.context.get('location_id'))
+                    #])
+            #qty_total = 0
+            #for quant in quants:
+                #qty_total += quant.qty
+            #if self.quantity_done > qty_total:
+                #self.quantity_done = 0
+                #message = "No tiene stock de este lote"
+                #res['warning'] = {'title': _('Warning'), 'message': message}
+        #if res:
+            #return res
+        #else:
+            #return super(StockMoveLots, self).do_plus()
+
 

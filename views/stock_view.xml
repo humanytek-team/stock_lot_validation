@@ -16,8 +16,8 @@
                     <field name="quantity" invisible="not context.get('show_reserved') or context.get('serial') or context.get('state_done')" readonly="1"/>
                     <field name="quantity_done" context="{'location_id': parent.location_id, 'raw_material': parent.raw_material_production_id}"/>
                     <button name="do_minus" type="object" icon="fa-minus-square" attrs="{'invisible': [('quantity_done', '&lt;=', 0.99)]}" invisible="not context.get('show_reserved') or context.get('state_done')"/>
-                    <button name="do_plus" type="object" icon="fa-plus-square" attrs="{'invisible': [('plus_visible', '=', False)]}" invisible="not context.get('show_reserved') or context.get('state_done')"/>
-                    <field name="plus_visible" invisible="1"/>
+                    <!--<button name="do_plus" type="object" icon="fa-plus-square" attrs="{'invisible': [('plus_visible', '=', False)]}" invisible="not context.get('show_reserved') or context.get('state_done')" />-->
+                    <field name="plus_visible" invisible="1" />
                     <field name="workorder_id" invisible="1"/>
                     <field name="done_wo" invisible="1"/>
                 </tree>
