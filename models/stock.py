@@ -20,7 +20,7 @@
 #
 ###############################################################################
 
-from odoo import api, fields, models, _
+from odoo import api, models, _
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -32,23 +32,15 @@ class StockMoveLots(models.Model):
     def onchange_lot(self):
         res = {}
         if self.env.context.get('raw_material'):
-            _logger.info('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-            _logger.info(self.move_id)
-            _logger.info(self.move_id.id)
-            _logger.info(self.env.context.get('location_id'))
-            _logger.info(self.env.context)
             StockQuant = self.env['stock.quant']
-            quants = StockQuant.search([('product_id.id', '=', self.product_id.id),
+            quants = StockQuant.search([
+                    ('product_id.id', '=', self.product_id.id),
                     ('lot_id.id', '=', self.lot_id.id),
                     ('location_id.id', '=', self.env.context.get('location_id'))
                     ])
             qty_total = 0
-
             for quant in quants:
                 qty_total += quant.qty
-            _logger.info('ppppppppppppppppppppppppppppppppppppppppppppp')
-            _logger.info(qty_total)
-            _logger.info(self.quantity_done)
             if self.quantity_done > qty_total:
                 self.quantity_done = 0
                 message = "No tiene stock de este lote"
