@@ -54,8 +54,15 @@ class StockPackOperationLot(models.Model):
     @api.onchange('lot_id', 'qty')
     def onchange_lot(self):
         res = {}
+        location_id = self.env.context.get('location_id')
+        StockLocation = self.env['stock.location']
+        location = StockLocation.search([('id', '=', location_id)])
+        if not location or location[0].usage == 'inventory' or \
+                            location[0].usage == 'supplier':
+            return res
         if self.lot_id and self.qty > 0:
-            if self.env.context.get('field_parent') and self.env.context.get('field_parent') == 'operation_id':
+            if self.env.context.get('field_parent') and \
+                    self.env.context.get('field_parent') == 'operation_id':
                 StockQuant = self.env['stock.quant']
                 quants = StockQuant.search([
                     ('product_id.id', '=',
