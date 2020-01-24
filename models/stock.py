@@ -25,57 +25,23 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-class StockMoveLots(models.Model):
-    _inherit = 'stock.move.lots'
+class StockMoveLine(models.Model):
+    _inherit = 'stock.move.line'
 
-    @api.onchange('lot_id', 'quantity_done')
+    @api.onchange('lot_id', 'qty_done')
     def onchange_lot(self):
         res = {}
-        if self.env.context.get('raw_material') and self.lot_id and self.quantity_done > 0:
+        print('hola', self.location_id.id)
+        if self.lot_id and self.qty_done > 0:
             StockQuant = self.env['stock.quant']
             quants = StockQuant.search([
-                    ('product_id.id', '=', self.product_id.id),
-                    ('lot_id.id', '=', self.lot_id.id),
-                    ('location_id.id', '=', self.env.context.get('location_id'))
-                    ])
-            qty_total = 0
-            for quant in quants:
-                qty_total += quant.qty
-            if self.quantity_done > qty_total:
-                self.quantity_done = 0
+                ('product_id.id', '=', self.product_id.id),
+                ('lot_id.id', '=', self.lot_id.id),
+                ('location_id.id', '=', self.location_id.id),
+            ])
+            qty_total = sum([quant.quantity for quant in quants])
+            if self.qty_done > qty_total:
+                self.qty_done = 0
                 message = "No tiene stock de este lote"
                 res['warning'] = {'title': _('Warning'), 'message': message}
         return res
-
-
-class StockPackOperationLot(models.Model):
-    _inherit = 'stock.pack.operation.lot'
-
-    @api.onchange('lot_id', 'qty')
-    def onchange_lot(self):
-        res = {}
-        location_id = self.env.context.get('location_id')
-        StockLocation = self.env['stock.location']
-        location = StockLocation.search([('id', '=', location_id)])
-        if not location or location[0].usage == 'inventory' or \
-                            location[0].usage == 'supplier':
-            return res
-        if self.lot_id and self.qty > 0:
-            if self.env.context.get('field_parent') and \
-                    self.env.context.get('field_parent') == 'operation_id':
-                StockQuant = self.env['stock.quant']
-                quants = StockQuant.search([
-                    ('product_id.id', '=',
-                        self.env.context.get('default_product_id')),
-                    ('lot_id.id', '=', self.lot_id.id),
-                    ('location_id.id', '=', self.env.context.get('location_id'))
-                    ])
-                qty_total = 0
-                for quant in quants:
-                    qty_total += quant.qty
-                if self.qty > qty_total:
-                    self.qty = 0
-                    message = "No tiene stock de este lote"
-                    res['warning'] = {'title': _('Warning'), 'message': message}
-        return res
-
