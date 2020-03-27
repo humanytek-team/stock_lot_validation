@@ -25,13 +25,26 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    def action_show_details(self):
+        stock_lot_ids = self.env['stock.quant'].search(
+            [('product_id', '=', self.product_id.id),
+             ('location_id', '=', self.location_id.id)]).ids
+        self.env.context = {'stock_lot_ids': stock_lot_ids}
+        return super(StockMove, self).action_show_details()
+
+
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
 
     @api.onchange('lot_id', 'qty_done')
     def onchange_lot(self):
         res = {}
-        print('hola', self.location_id.id)
+        location = self.location_id
+        if location.usage == 'supplier' or location.usage == 'inventory':
+            return res
         if self.lot_id and self.qty_done > 0:
             StockQuant = self.env['stock.quant']
             quants = StockQuant.search([
